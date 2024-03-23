@@ -14,9 +14,9 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Please provide your lastname'],
         minlength: 3,
         maxlength: 50,
-    },
-    email: {
-        type: String,
+    }, 
+    email: {  
+        type: String,  
         unique: true,
         index: true,
         required: [true, 'Please provide your email'],
@@ -26,9 +26,13 @@ const UserSchema = new mongoose.Schema({
         },
     },
     password: {
-        type: String,
+        type: String, 
         required: [true, 'Please provide a password'],
         minlength: 6,
+    },
+    phone: {
+        type: String,
+        required: [true, 'Please provide your phone number'],
     },
     role: {
         type: String,
@@ -38,7 +42,7 @@ const UserSchema = new mongoose.Schema({
     verificationToken: String,
     isVerified: {
         type: Boolean,
-        default: false,
+        default: false,   
     },
     verified: Date,
     passwordToken: {

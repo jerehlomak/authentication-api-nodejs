@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 const sgMail = require("@sendgrid/mail");
 const nodemailerConfig = require('./nodeMailerConfig')
 
-const sendjEmail = async ({ to, subject, html }) => {
+const sendEmail = async ({ to, subject, html }) => {
     let testAccount = await nodemailer.createTestAccount()
 
     const transporter = nodemailer.createTransport(nodemailerConfig);
@@ -21,13 +21,13 @@ const sendjEmail = async ({ to, subject, html }) => {
         subject,
         html,
     })
-    res.json(info)
+    
 }
 
-const sendEmail = async ({ to, subject, html }) => {
+const sendrEmail = async ({ to, subject, html }) => {
   sgMail.setApiKey(process.env.SENDGRID_API_KEY);
   const msg = {
-    from: 'jerehlomak@gmail.com',
+    from: 'tripescape97@gmail.com',
     to,
     subject,
     html,

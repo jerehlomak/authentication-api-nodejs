@@ -12,7 +12,7 @@ const {
 const crypto = require("crypto");
 
 const register = async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, password, phone } = req.body;
 
   const emailAlreadyExists = await User.findOne({ email });
   if (emailAlreadyExists) {
@@ -24,11 +24,12 @@ const register = async (req, res) => {
 
   const verificationToken = crypto.randomBytes(40).toString("hex");
 
-  const user = await User.create({
+  const user = await User.create({ 
     firstName,
     lastName,
     email,
     password,
+    phone,
     role,
     verificationToken,
   });
@@ -66,7 +67,7 @@ const verifyEmail = async (req, res) => {
 
   // save user using instance
   await user.save();
-
+ 
   res.status(StatusCodes.OK).json({ msg: "Email Verified" });
 };
 
@@ -150,15 +151,16 @@ const forgotPassword = async (req, res) => {
 
   if (user) {
     const passwordToken = crypto.randomBytes(70).toString('hex')
+
     // send email
     const origin = 'http://localhost:3000'
     await sendResetPasswordEmail({
       name: user.firstName,
       email: user.email,
       token: passwordToken,
-      origin,
+      origin, 
     })
-
+    console.log(passwordToken)
     //set expiration
     const tenMinutes = 1000 * 60 * 10
     const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes)
@@ -170,7 +172,7 @@ const forgotPassword = async (req, res) => {
 
   res.status(StatusCodes.OK).json({ msg: 'Please check your email for reset password link' })
 }
-
+ 
 // reset password
 const resetPassword = async (req, res) => {
   const { token, email, password } = req.body
