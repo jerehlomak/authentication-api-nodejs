@@ -16,12 +16,12 @@ const sendEmail = async ({ to, subject, html }) => {
     //   });
 
     let info =  transporter.sendMail({
-        from: '"Jerry Lomak" <jerehlomak@gmail.com>',
+        from: '"Jerry Lomak" <jerehlomak@gmail.com>', 
         to,
         subject,
         html,
     })
-    
+    console.log("Message sent: %s", info.messageId);
 }
 
 const sendrEmail = async ({ to, subject, html }) => {
@@ -34,7 +34,7 @@ const sendrEmail = async ({ to, subject, html }) => {
   };
    sgMail.send(msg)
         .then((response) => console.log('Email sent...'))
-        .catch((error) => console.log(error.message))
+        .catch((error) => console.log(error.message)) 
 };
 
 

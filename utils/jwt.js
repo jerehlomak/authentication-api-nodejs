@@ -36,7 +36,7 @@ const attachCookiesToResponse = ({ res, user, refreshToken }) => {
     signed: true,
     expires: new Date(Date.now() + longerExpiration),
   });
-};
+}; 
 
 // const attachSingleCookieToResponse = ({ res, user }) => {
 //     const token = createJWT({ payload: user })

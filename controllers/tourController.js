@@ -1,6 +1,7 @@
 const Tour = require('../models/Tour')
 const StatusCodes = require('http-status-codes')
 const CustomError = require('../errors')
+const cloudinary = require('cloudinary').v2
 const Joi = require('joi')
 
 const getAllTours = async (req, res) => {
@@ -58,17 +59,24 @@ const getAllTours = async (req, res) => {
 
 const getSingleTour = async (req, res) => {
     const { id: tourId } = req.params
-    console.log(tourId)
+
     const tour = await Tour.findOne({ _id: tourId }).populate('reviews')
     if (!tour) {
         throw new CustomError.NotFoundError(`No tour with id: ${tourId}`)
     }
-    console.log(tour)
     res.status(StatusCodes.OK).json({ tour })
 }
 
 const createTour = async (req, res) => {
     req.body.user = req.user.userId
+    const result = await cloudinary.uploader.upload(
+        req.files.images.tempFilePath,
+        {
+            use_filename: true,
+            folder: 'file-upload',
+        }
+    )
+    console.log(result);
     const tour = await Tour.create(req.body)
     
     res.status(StatusCodes.OK).json({ msg: 'tour successfully created' })

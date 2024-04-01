@@ -42,6 +42,10 @@ const TourSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    excluded: {
+        type: [String],
+        required: true,
+    }, 
     included: {
         type: [String],
         required: true,

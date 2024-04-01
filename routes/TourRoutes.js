@@ -18,7 +18,7 @@ router.route('/')
         .get(getAllTours)
 
 router.route('/:id')
-        .get(getSingleTour)
+        .get(getSingleTour) 
         .patch([authenticateUser, authorizePermissions('admin')], updateTour)
         .delete([authenticateUser, authorizePermissions('admin')], deleteTour)
 

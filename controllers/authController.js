@@ -111,18 +111,18 @@ const login = async (req, res) => {
 
     res.status(StatusCodes.OK).json({ user: tokenUser });
     return
-  }
+   }
     // set up the Token model
   refreshToken = crypto.randomBytes(40).toString('hex')
   const userAgent = req.headers['user-agent']
   const ip = req.ip
   const userToken = { refreshToken, ip, userAgent, user: user._id }
 
-  await Token.create(userToken)
+  const token =  await Token.create(userToken)
 
   attachCookiesToResponse({ res, user: tokenUser, refreshToken });
 
-  res.status(StatusCodes.OK).json({ user: tokenUser });
+  res.status(StatusCodes.OK).json({ users: tokenUser });
 };
 
 const logout = async (req, res) => {
@@ -160,12 +160,11 @@ const forgotPassword = async (req, res) => {
       token: passwordToken,
       origin, 
     })
-    console.log(passwordToken)
     //set expiration
     const tenMinutes = 1000 * 60 * 10
     const passwordTokenExpirationDate = new Date(Date.now() + tenMinutes)
 
-    user.passwordToken = createHash(passwordToken)
+    user.passwordToken = passwordToken
     user.passwordTokenExpirationDate = passwordTokenExpirationDate
     await user.save()
   }
@@ -184,14 +183,14 @@ const resetPassword = async (req, res) => {
   if (user) {
     const currentDate = new Date()
 
-    if (user.passwordToken === createHash(token) && user.passwordTokenExpirationDate > currentDate) {
+    if (user.passwordToken === token && user.passwordTokenExpirationDate > currentDate) {
       user.password = password
       user.passwordToken = null
       user.passwordTokenExpirationDate = null
       await user.save()
     }
   }
-   res.send('reset password')
+   res.status(StatusCodes.OK).json({ msg: 'Password reset Successful' })
 }
 
 module.exports = {

@@ -90,11 +90,14 @@ const getAllReviews = async (req, res) => {
 
 // all reviews of a particular tour
 const getSingleTourReviews = async (req, res) => {
-    const { id: tourId } = request.params
+    const { id: tourId } = req.params
 
-    const reviews = await Review.find({ tour: tourId })
+    const reviews = await Review.find({ tour: tourId }).populate({
+        path: 'user',
+        select: 'firstName lastName'
+    })
 
-    res.status(StatusCodes.OK).json({ reviews, count: reviews.length })
+    res.status(StatusCodes.OK).json({ reviews, count: reviews.length, msg: 'Successfully added your review' })
 }
 
 module.exports = {

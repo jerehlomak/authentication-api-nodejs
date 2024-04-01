@@ -4,6 +4,12 @@ require('express-async-errors')
 //express
 const express = require('express')
 const app = express()
+const cloudinary = require('cloudinary').v2
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET
+})
 //rest of the packages 
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -29,12 +35,12 @@ const notFoundMiddleware = require('./middleware/not-found')
 const errorHandlerMiddleware = require('./middleware/error-handler')
 
 app.set('trust proxy', 1)
-app.use(
-    rateLimiter({
-        windowMs: 15 * 60 * 1000,
-        max: 60,
-    })
-)
+// app.use(
+//     rateLimiter({
+//         windowMs: 20 * 60 * 1000,
+//         max: 100,
+//     })
+// )
 app.use(mongoSanitize())
 app.use(cors())
 app.use(helmet())
@@ -42,10 +48,11 @@ app.use(xss())
 
 app.use(express.json())
 app.use(cookieParser(process.env.JWT_SECRET))
+app.use(fileUpload({ useTempFiles: true }))
 
-app.use('/auth', authRouter)
+app.use('/auth', authRouter) 
 app.use('/user', userRouter)
-app.use('/tour', TourRouter)
+app.use('/tour', TourRouter) 
 app.use('/review', reviewRouter)
 app.use('/contact', contactRouter)
 
