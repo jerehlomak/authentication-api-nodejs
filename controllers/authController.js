@@ -92,6 +92,40 @@ const login = async (req, res) => {
     throw new CustomError.UnauthenticatedError("Please Verify your email");
   }
 
+  // compare password
+  const token = user.createJWT();
+
+  res.status(StatusCodes.OK).json({
+    user: {
+      email: user.email,
+      lastName: user.lastName,
+      firstName: user.firstName,
+      token,
+    },
+  });
+};
+
+const loginuser = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new CustomError.BadRequestError("Please provide email and password");
+  }
+  const user = await User.findOne({ email });
+  // if user is not registered throw error
+  if (!user) {
+    throw new CustomError.UnauthenticatedError("Invalid Credentials");
+  }
+  // compare password for register and login
+  const isPasswordCorrect = await user.comparePassword(password);
+  if (!isPasswordCorrect) {
+    throw new CustomError.UnauthenticatedError("Invalid Password");
+  }
+  // verify user account before login
+  if (!user.isVerified) {
+    throw new CustomError.UnauthenticatedError("Please Verify your email");
+  }
+
   const tokenUser = createTokenUser(user);
 
   // create refresh token
@@ -99,7 +133,7 @@ const login = async (req, res) => {
 
   // check for existing token
   const existingToken = await Token.findOne({ user: user._id })
-  console.log(existingToken)
+
   // change isvalid to false for users that are trespassing
   if (existingToken) {
     const { isValid } = existingToken
@@ -146,7 +180,6 @@ const forgotPassword = async (req, res) => {
   if (!email) {
     throw new CustomError.UnauthenticatedError('Email does not exist')
   }
-
   const user = await User.findOne({ email })
 
   if (user) {

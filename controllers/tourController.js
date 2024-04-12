@@ -3,6 +3,11 @@ const StatusCodes = require('http-status-codes')
 const CustomError = require('../errors')
 const cloudinary = require('cloudinary').v2
 const Joi = require('joi')
+const multer = require('multer')
+const fs = require('fs');
+const { resolve } = require('path')
+
+const upload  = multer({ dest: 'uploads/' })
 
 const getAllTours = async (req, res) => {
     const { search, category, location, duration, sort, priceMin, priceMax } = req.query
@@ -67,24 +72,23 @@ const getSingleTour = async (req, res) => {
     res.status(StatusCodes.OK).json({ tour })
 }
 
+
 const createTour = async (req, res) => {
-    req.body.user = req.user.userId
-    const result = await cloudinary.uploader.upload(
-        req.files.images.tempFilePath,
-        {
-            use_filename: true,
-            folder: 'file-upload',
-        }
-    )
-    console.log(result);
-    const tour = await Tour.create(req.body)
+    console.log(req.body)
+    try {
+        req.body.user = req.user.userId;
     
-    res.status(StatusCodes.OK).json({ msg: 'tour successfully created' })
+        const tour = await Tour.create(req.body);    
+        res.status(StatusCodes.OK).json({ tour });
+        //res.status(StatusCodes.OK).json({ msg: 'Tour successfully created', tour });
+    } catch (error) {
+        console.error('Error creating tour:', error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: 'Failed to create tour' });
+    }
 }
 
-
 const updateTour = async (req, res) => {
-    const { id: tourId } = req.params
+    const { id: tourId } = req.params 
 
     const tour = await Tour.findOneAndUpdate({ _id: tourId }, req.body, {
         new: true,
@@ -114,6 +118,52 @@ const getSingleTourReview = async (req, res) => {
     
     res.status(StatusCodes.OK).json({ msg: 'tour review' })
 }
+const opts = {
+    overwrite: true,
+    invalidate: true,
+    resource_type: 'auto'
+}
+
+const uploadImage = async (req, res) => {
+    try {
+        const uploadPromises = req.files.images.map(async (file) => {
+          const result = await cloudinary.uploader.upload(file.tempFilePath, {
+            use_filename: true,
+            folder: 'file-upload',
+          });
+          fs.unlinkSync(file.tempFilePath);
+          return { src: result.secure_url };
+        });
+    
+        const uploadedImages = await Promise.all(uploadPromises);
+        return res.status(StatusCodes.OK).json({ images: uploadedImages });
+      } catch (error) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+      }
+  };
+
+const uploadImages = (image) => {
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.upload(image, opts, (error, result) => {
+            if (result && result.secure_url) {
+                console.log(result.secure_url)
+                return resolve(result.secure_url)
+            }
+            console.log(error.message)
+            return reject({ message: error.message })
+        })
+    })
+
+  };
+
+const uploadImagess = async (req, res) => {
+    uploadImages(req.body.images)
+        .then((url) => res.send(url))
+        .catch((err) => res.status(500).send(err))
+   
+} 
+
+
 
 module.exports = {
     getAllTours,
@@ -121,7 +171,8 @@ module.exports = {
     updateTour,
     deleteTour,
     createTour,
-    getSingleTourReview
+    getSingleTourReview,
+    uploadImage
 }
 
 

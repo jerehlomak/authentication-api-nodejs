@@ -19,6 +19,7 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 // database
 const connectDB = require('./db/connect')
@@ -29,6 +30,9 @@ const userRouter = require('./routes/userRoutes')
 const TourRouter = require('./routes/TourRoutes')
 const reviewRouter = require('./routes/reviewRoutes')
 const contactRouter = require('./routes/contactRoute')
+const stripeController = require('./controllers/stripesController')
+
+const depositController = require('./controllers/stripeController')
 
 //middleware
 const notFoundMiddleware = require('./middleware/not-found')
@@ -45,16 +49,21 @@ app.use(mongoSanitize())
 app.use(cors())
 app.use(helmet())
 app.use(xss())
+app.post('/stripe')
 
 app.use(express.json())
 app.use(cookieParser(process.env.JWT_SECRET))
 app.use(fileUpload({ useTempFiles: true }))
+
+app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
 app.use('/auth', authRouter) 
 app.use('/user', userRouter)
 app.use('/tour', TourRouter) 
 app.use('/review', reviewRouter)
 app.use('/contact', contactRouter)
+app.post('/deposit', depositController.payWithFlutterwave)
+app.post('/create-checkout-session', stripeController)
 
 app.use(notFoundMiddleware)
 app.use(errorHandlerMiddleware)

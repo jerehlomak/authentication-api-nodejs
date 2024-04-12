@@ -2,7 +2,8 @@ const express = require('express')
 const router = express.Router()
 const {
     authenticateUser,
-    authorizePermissions
+    authorizePermissions,
+    authUser
 } = require('../middleware/authentication')
 const {
     getAllUsers,
@@ -12,10 +13,10 @@ const {
     updateUserPassword,
 } = require('../controllers/userController')
 
-router.route('/').get(authenticateUser, authorizePermissions('admin'), getAllUsers)
-router.route('/showMe').get(authenticateUser, showCurrentUser)
-router.route('/updateUser').post(authenticateUser, updateUser)
-router.route('/updateUserPassword').post(authenticateUser, updateUserPassword)
-router.route('/:id').get(authenticateUser, getSingleUser)
+router.route('/').get(authUser, authorizePermissions('admin'), getAllUsers)
+router.route('/showMe').get(authUser, showCurrentUser)
+router.route('/updateUser').post(authUser, updateUser)
+router.route('/updateUserPassword').post(authUser, updateUserPassword)
+router.route('/:id').get(authUser, getSingleUser)
 
 module.exports = router
