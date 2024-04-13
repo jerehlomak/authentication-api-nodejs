@@ -19,7 +19,6 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 // database
 const connectDB = require('./db/connect')

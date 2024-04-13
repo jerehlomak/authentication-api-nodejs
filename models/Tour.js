@@ -50,6 +50,18 @@ const TourSchema = new mongoose.Schema({
         type: [String],
         required: true,
     }, 
+    supplements: {
+        type: [String],
+    },
+    cancellation: {
+        type: [String],
+    }, 
+    table: {
+        type: [[String]],
+    },  
+    notes: {
+        type: [String],
+    }, 
     tourPlans: {
         type: [[String]],
         required: true

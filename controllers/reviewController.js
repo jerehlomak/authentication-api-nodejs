@@ -102,7 +102,7 @@ const getSingleTourReviews = async (req, res) => {
 
 module.exports = {
     createReview,
-    updateReview,
+    updateReview, 
     deleteReview,
     getSingleReview,
     getAllReviews,
