@@ -1,7 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const createStripeSession = async (tour) => {
-  const my_domain = 'https://tripescape.ng/'
+  const my_domain = 'https://tripescape.ng'
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: [
